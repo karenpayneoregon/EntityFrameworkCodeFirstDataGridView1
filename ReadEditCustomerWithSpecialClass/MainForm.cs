@@ -17,7 +17,7 @@ using static ReadEditCustomerWithSpecialClass.Classes.Dialogs;
 
 namespace ReadEditCustomerWithSpecialClass
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         // responsible for obtaining data
         private readonly Operations _operations = new Operations();
@@ -30,7 +30,7 @@ namespace ReadEditCustomerWithSpecialClass
 
         private readonly BindingSource _customersBindingSource = new BindingSource();
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
