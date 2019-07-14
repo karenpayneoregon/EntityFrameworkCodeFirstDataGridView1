@@ -87,6 +87,21 @@ namespace NorthWindDataLibrary.Classes
                 return context.Contacts.ToList();
             }
         }
+
+        /// <summary>
+        /// Remove customer by primary key
+        /// </summary>
+        /// <param name="pCustomerIdentifier"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Discuss cascading delete rules
+        ///     - how to check for child table usage
+        /// </remarks>
+        public bool RemoveCustomer(int pCustomerIdentifier)
+        {
+            return true;
+        }
+
     }
 }
 

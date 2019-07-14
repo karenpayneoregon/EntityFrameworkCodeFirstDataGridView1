@@ -13,6 +13,7 @@ using Equin.ApplicationFramework;
 using NorthWindDataLibrary;
 using NorthWindDataLibrary.Classes;
 using ReadEditCustomerWithSpecialClass.LanguageExtensions;
+using static ReadEditCustomerWithSpecialClass.Classes.Dialogs;
 
 namespace ReadEditCustomerWithSpecialClass
 {
@@ -156,6 +157,8 @@ namespace ReadEditCustomerWithSpecialClass
 
             gridView.ExpandColumns();
 
+            bindingNavigator1.BindingSource = _customersBindingSource;
+
         }
         private void DataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
@@ -268,6 +271,41 @@ namespace ReadEditCustomerWithSpecialClass
                  */
                 MessageBox.Show(ex.Message);
             }
+        }
+        /// <summary>
+        /// Delete customer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void bindingNavigatorDeleteCustomer_Click(object sender, EventArgs e)
+        {
+            var currentCustomer = _customersBindingSource.CurrentCustomerEntity();
+
+            if (Question($"Delete '{currentCustomer.CompanyName}'"))
+            {
+                if (!_operations.RemoveCustomer(currentCustomer.CustomerIdentifier))
+                {
+                    MessageBox.Show("Removal failed");
+                }
+            }
+        }
+        /// <summary>
+        /// Add new customer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void bindingNavigatorAddNewCustomer_Click(object sender, EventArgs e)
+        {
+            // talk about various options
+        }
+        /// <summary>
+        /// Find customer by ??? 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButtonFindCustomer_Click(object sender, EventArgs e)
+        {
+            // talk options
         }
     }
 }
