@@ -35,6 +35,7 @@ namespace ReadEditCustomerWithSpecialClass
             InitializeComponent();
 
             Shown += Form1_Shown;
+            Closing += MainForm_Closing;
             gridView.DataError += CustomersDataGridView_DataError;
             gridView.CellPainting += GridView_CellPainting;
             gridView.CellContentClick += GridView_CellContentClick;
@@ -43,9 +44,9 @@ namespace ReadEditCustomerWithSpecialClass
 
             gridView.CellToolTipTextNeeded += GridView_CellToolTipTextNeeded;
             gridView.ShowCellToolTips = true;
-
             
         }
+
         /// <summary>
         /// Handles DataGridViewButtonColumn on current row in the DataGridView
         /// to allow changing the contact for the current customer
@@ -66,7 +67,8 @@ namespace ReadEditCustomerWithSpecialClass
             {
                 var newId = f.ContactIdentifier;
                 var contact = _operations.GetContacts().FirstOrDefault(cont => cont.ContactId == newId);
-                var customer = context.Customers.FirstOrDefault(cust => cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
+                var customer = context.Customers
+                    .FirstOrDefault(cust => cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
 
                 customerEntity.FirstName = contact.FirstName;
                 customerEntity.LastName = contact.LastName;
@@ -75,6 +77,7 @@ namespace ReadEditCustomerWithSpecialClass
                 customer.ContactName = $"{contact.FirstName} {contact.LastName}";
                 _customersBindingSource.ResetCurrentItem();
             }
+
         }
         /// <summary>
         /// Show tooltip for DataGridViewButtonColumn on current DataGridViewRow
@@ -126,6 +129,28 @@ namespace ReadEditCustomerWithSpecialClass
             //MessageBox.Show($"Encountered: {e.Exception.Message}");
             e.Cancel = true;
         }
+        /// <summary>
+        /// Check if there are any pending changes, if so ask user if
+        /// they want to cancel closing the form to save changes.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_Closing(object sender, CancelEventArgs e)
+        {
+            if (context.ChangeTracker.HasChanges())
+            {
+                if (!Question("There are pending changes, abort?"))
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+        /// <summary>
+        /// * Get data from database tables
+        /// * Setup events to work with data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Shown(object sender, EventArgs e)
         {
             gridView.EditingControlShowing += DataGridView1_EditingControlShowing;
@@ -159,7 +184,17 @@ namespace ReadEditCustomerWithSpecialClass
 
             bindingNavigator1.BindingSource = _customersBindingSource;
 
+            var contactTypes = _operations.GetContactTypes();
+            contactTypes.Insert(0, new ContactType() { ContactTypeIdentifier = 0, ContactTitle = "All"});
+            ContactTypeComboBox.DataSource = contactTypes;
+            ContactTypeComboBox.DisplayMember = "ContactTitle";
+
         }
+        /// <summary>
+        /// Handles changes for both DataGridViewComboBox columns
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
             if (!gridView.CurrentCell.IsComboBoxCell()) return;
@@ -178,23 +213,39 @@ namespace ReadEditCustomerWithSpecialClass
                 comboBox.SelectionChangeCommitted += SelectionChangeCommittedForContactTitleColumn;
             }
         }
-
+        /// <summary>
+        /// Set backing customer field foreign key for Country for current customer record
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectionChangeCommittedForCountryColumn(object sender, EventArgs e)
         {
             var customer = _customersBindingSource.CurrentCustomerEntity();
-            var identifier = ((CountryItem)(((DataGridViewComboBoxEditingControl)sender).SelectedItem)).CountryIdentifier;
+            var identifier = ((CountryItem)(((DataGridViewComboBoxEditingControl)sender).SelectedItem))
+                .CountryIdentifier;
+
             customer.CountryIdentifier = identifier;
             // ReSharper disable once PossibleNullReferenceException
-            context.Customers.FirstOrDefault(cust => cust.CustomerIdentifier == customer.CustomerIdentifier).CountryIdentifier = identifier;
+            context.Customers
+                .FirstOrDefault(cust => cust.CustomerIdentifier == customer.CustomerIdentifier)
+                .CountryIdentifier = identifier;
         }
-
+        /// <summary>
+        /// Set backing customer field foreign key for contact title type for current customer record
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectionChangeCommittedForContactTitleColumn(object sender, EventArgs e)
         {
             var customer = _customersBindingSource.CurrentCustomerEntity();
-            var identifier = ((ContactType)(((DataGridViewComboBoxEditingControl)sender).SelectedItem)).ContactTypeIdentifier;
+            var identifier = ((ContactType)(((DataGridViewComboBoxEditingControl)sender).SelectedItem))
+                .ContactTypeIdentifier;
+
             customer.ContactTypeIdentifier = identifier;
             // ReSharper disable once PossibleNullReferenceException
-            context.Customers.FirstOrDefault(cust => cust.CustomerIdentifier == customer.CustomerIdentifier).ContactTypeIdentifier = identifier;
+            context.Customers
+                .FirstOrDefault(cust => cust.CustomerIdentifier == customer.CustomerIdentifier)
+                .ContactTypeIdentifier = identifier;
         }
         /// <summary>
         /// Save all changes, for learning the number of changes
@@ -231,7 +282,8 @@ namespace ReadEditCustomerWithSpecialClass
             var currentColumnName = gridView.CurrentCell.OwningColumn.Name;
 
             var customerEntity = _customersBindingSource.CurrentCustomerEntity();
-            var customer = context.Customers.FirstOrDefault(cust => cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
+            var customer = context.Customers
+                .FirstOrDefault(cust => cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
 
             /*
              * Handle DataGridViewComboBox columns
@@ -244,7 +296,8 @@ namespace ReadEditCustomerWithSpecialClass
                 if (currentColumnName == "ContactTitleColumn")
                 {
                     var contactTitleIdentifier = context.ContactTypes
-                        .FirstOrDefault(contactType => contactType.ContactTitle == gridView.EditingControl.Text).ContactTypeIdentifier;
+                        .FirstOrDefault(contactType => contactType.ContactTitle == gridView.EditingControl.Text)
+                        .ContactTypeIdentifier;
 
                     context.Entry(customer).Property(x => x.ContactTypeIdentifier).CurrentValue = contactTitleIdentifier;
 
@@ -283,29 +336,54 @@ namespace ReadEditCustomerWithSpecialClass
 
             if (Question($"Delete '{currentCustomer.CompanyName}'"))
             {
-                if (!_operations.RemoveCustomer(currentCustomer.CustomerIdentifier))
-                {
-                    MessageBox.Show("Removal failed");
-                }
+                var customer = context.Customers
+                    .FirstOrDefault(cust => cust.CustomerIdentifier == currentCustomer.CustomerIdentifier);
+
+                context.Entry(customer).State = EntityState.Deleted;
+                _customersBindingSource.RemoveCurrent();
             }
         }
         /// <summary>
-        /// Add new customer
+        /// Add new customer, this could be done inline yet
+        /// the best option is to show a modal form, present
+        /// options for contact type and country. Also use data annotation
+        /// for validating against attributes e.g. required, length of a
+        /// field etc.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void bindingNavigatorAddNewCustomer_Click(object sender, EventArgs e)
         {
-            // talk about various options
+
         }
         /// <summary>
-        /// Find customer by ??? 
+        /// Example of a like condition on company name
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void toolStripButtonFindCustomer_Click(object sender, EventArgs e)
         {
-            // talk options
+            _customersView.ApplyFilter(customer => customer.CompanyName.Contains("suey"));
         }
+        /// <summary>
+        /// Example of a filter on an exact type, in this case contact type
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FilterByContactTypeButton_Click(object sender, EventArgs e)
+        {
+            var selectedContactType = (ContactType)ContactTypeComboBox.SelectedItem;
+
+            if (selectedContactType.ContactTypeIdentifier == 0)
+            {
+                _customersView.Filter = null;
+            }
+            else
+            {
+                _customersView.ApplyFilter(customer => customer.ContactTypeIdentifier == selectedContactType.ContactTypeIdentifier);
+
+            }
+        }
+
     }
 }

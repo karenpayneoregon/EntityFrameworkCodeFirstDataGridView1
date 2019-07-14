@@ -43,11 +43,11 @@
             this.CountyNameColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.EditContactColumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
+            this.bindingNavigatorCountItem = new System.Windows.Forms.ToolStripLabel();
             this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorMovePreviousItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.bindingNavigatorPositionItem = new System.Windows.Forms.ToolStripTextBox();
-            this.bindingNavigatorCountItem = new System.Windows.Forms.ToolStripLabel();
             this.bindingNavigatorSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bindingNavigatorMoveNextItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
@@ -55,6 +55,8 @@
             this.bindingNavigatorAddNewCustomer = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorDeleteCustomer = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonFindCustomer = new System.Windows.Forms.ToolStripButton();
+            this.ContactTypeComboBox = new System.Windows.Forms.ComboBox();
+            this.FilterByContactTypeButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
@@ -63,11 +65,13 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.FilterByContactTypeButton);
+            this.panel1.Controls.Add(this.ContactTypeComboBox);
             this.panel1.Controls.Add(this.SaveAllChangesButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 396);
+            this.panel1.Location = new System.Drawing.Point(0, 390);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1074, 54);
+            this.panel1.Size = new System.Drawing.Size(1074, 60);
             this.panel1.TabIndex = 0;
             // 
             // SaveAllChangesButton
@@ -97,7 +101,7 @@
             this.gridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridView.Location = new System.Drawing.Point(0, 25);
             this.gridView.Name = "gridView";
-            this.gridView.Size = new System.Drawing.Size(1074, 371);
+            this.gridView.Size = new System.Drawing.Size(1074, 365);
             this.gridView.TabIndex = 1;
             this.gridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.gridView_CurrentCellDirtyStateChanged);
             // 
@@ -191,6 +195,13 @@
             this.bindingNavigator1.TabIndex = 2;
             this.bindingNavigator1.Text = "bindingNavigator1";
             // 
+            // bindingNavigatorCountItem
+            // 
+            this.bindingNavigatorCountItem.Name = "bindingNavigatorCountItem";
+            this.bindingNavigatorCountItem.Size = new System.Drawing.Size(35, 22);
+            this.bindingNavigatorCountItem.Text = "of {0}";
+            this.bindingNavigatorCountItem.ToolTipText = "Total number of items";
+            // 
             // bindingNavigatorMoveFirstItem
             // 
             this.bindingNavigatorMoveFirstItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -223,16 +234,9 @@
             this.bindingNavigatorPositionItem.Text = "0";
             this.bindingNavigatorPositionItem.ToolTipText = "Current position";
             // 
-            // bindingNavigatorCountItem
-            // 
-            this.bindingNavigatorCountItem.Name = "bindingNavigatorCountItem";
-            this.bindingNavigatorCountItem.Size = new System.Drawing.Size(35, 22);
-            this.bindingNavigatorCountItem.Text = "of {0}";
-            this.bindingNavigatorCountItem.ToolTipText = "Total number of items";
-            // 
             // bindingNavigatorSeparator1
             // 
-            this.bindingNavigatorSeparator1.Name = "bindingNavigatorSeparator";
+            this.bindingNavigatorSeparator1.Name = "bindingNavigatorSeparator1";
             this.bindingNavigatorSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // bindingNavigatorMoveNextItem
@@ -255,14 +259,14 @@
             // 
             // bindingNavigatorSeparator2
             // 
-            this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator";
+            this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
             this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // bindingNavigatorAddNewCustomer
             // 
             this.bindingNavigatorAddNewCustomer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bindingNavigatorAddNewCustomer.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorAddNewCustomer.Image")));
-            this.bindingNavigatorAddNewCustomer.Name = "bindingNavigatorAddNewItem";
+            this.bindingNavigatorAddNewCustomer.Name = "bindingNavigatorAddNewCustomer";
             this.bindingNavigatorAddNewCustomer.RightToLeftAutoMirrorImage = true;
             this.bindingNavigatorAddNewCustomer.Size = new System.Drawing.Size(23, 22);
             this.bindingNavigatorAddNewCustomer.Text = "Add new";
@@ -272,7 +276,7 @@
             // 
             this.bindingNavigatorDeleteCustomer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bindingNavigatorDeleteCustomer.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorDeleteCustomer.Image")));
-            this.bindingNavigatorDeleteCustomer.Name = "bindingNavigatorDeleteItem";
+            this.bindingNavigatorDeleteCustomer.Name = "bindingNavigatorDeleteCustomer";
             this.bindingNavigatorDeleteCustomer.RightToLeftAutoMirrorImage = true;
             this.bindingNavigatorDeleteCustomer.Size = new System.Drawing.Size(23, 22);
             this.bindingNavigatorDeleteCustomer.Text = "Delete";
@@ -288,7 +292,26 @@
             this.toolStripButtonFindCustomer.Text = "toolStripButton1";
             this.toolStripButtonFindCustomer.Click += new System.EventHandler(this.toolStripButtonFindCustomer_Click);
             // 
-            // Form1
+            // ContactTypeComboBox
+            // 
+            this.ContactTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ContactTypeComboBox.FormattingEnabled = true;
+            this.ContactTypeComboBox.Location = new System.Drawing.Point(729, 15);
+            this.ContactTypeComboBox.Name = "ContactTypeComboBox";
+            this.ContactTypeComboBox.Size = new System.Drawing.Size(173, 21);
+            this.ContactTypeComboBox.TabIndex = 3;
+            // 
+            // FilterByContactTypeButton
+            // 
+            this.FilterByContactTypeButton.Location = new System.Drawing.Point(908, 15);
+            this.FilterByContactTypeButton.Name = "FilterByContactTypeButton";
+            this.FilterByContactTypeButton.Size = new System.Drawing.Size(154, 23);
+            this.FilterByContactTypeButton.TabIndex = 4;
+            this.FilterByContactTypeButton.Text = "Filter by contact type";
+            this.FilterByContactTypeButton.UseVisualStyleBackColor = true;
+            this.FilterByContactTypeButton.Click += new System.EventHandler(this.FilterByContactTypeButton_Click);
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -296,7 +319,7 @@
             this.Controls.Add(this.gridView);
             this.Controls.Add(this.bindingNavigator1);
             this.Controls.Add(this.panel1);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.panel1.ResumeLayout(false);
@@ -336,6 +359,8 @@
         private System.Windows.Forms.ToolStripButton bindingNavigatorMoveLastItem;
         private System.Windows.Forms.ToolStripSeparator bindingNavigatorSeparator2;
         private System.Windows.Forms.ToolStripButton toolStripButtonFindCustomer;
+        private System.Windows.Forms.ComboBox ContactTypeComboBox;
+        private System.Windows.Forms.Button FilterByContactTypeButton;
     }
 }
 
