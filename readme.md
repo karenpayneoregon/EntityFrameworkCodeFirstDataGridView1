@@ -2,7 +2,7 @@
 
 ![Screenshot](Asserts/F1.png)
 
-The focus of this repository code is to demonstrate using Entity Framework, code first with an existing database. Most examples will show how to display, edit a single table’s worth of data and in rare cases a master-detail view which usually is done with data wizards. Here the main view is a customer table with two child tables, contact type and country which means the use of joins and the challenge to display, edit, add, delete, sort and filter. Data is presented in a DataGridView with several DataGridViewComboBox columns. The intent is to take away the challenge of dealing with how to save changes of a multi-join data result as in applications rarely are single table presentations.
+The focus of this repository code is to demonstrate using Entity Framework, code first with an existing database. Most examples will show how to display, edit a single table’s worth of data and in rare cases a master-detail view which usually is done with data wizards. Here the main view is a customer table with three child tables, contact, contact type and country which means the use of joins and the challenge to display, edit, add, delete, sort and filter. Data is presented in a DataGridView with several DataGridViewComboBox columns. The intent is to take away the challenge of dealing with how to save changes of a multi-join data result as in applications rarely are single table presentations.
 
 Code within this repository is a work in progress, all code present has been tested to function before pushed to this repository.
 
