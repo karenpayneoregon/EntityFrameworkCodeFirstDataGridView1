@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Forms;
 using NorthWindDataLibrary;
 using NorthWindDataLibrary.Classes;
+using NorthWindDataLibrary.NorthWindModels;
 
 namespace ReadEditCustomerWithSpecialClass
 {

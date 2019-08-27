@@ -1,12 +1,11 @@
-namespace NorthWindDataLibrary
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using NorthWindDataLibrary.Classes;
 
-    public partial class Customer
+namespace NorthWindDataLibrary.NorthWindModels
+{
+    public partial class Customer : BaseEntity
     {
         [Key]
         public int CustomerIdentifier { get; set; }
@@ -50,5 +49,7 @@ namespace NorthWindDataLibrary
         public virtual ContactType ContactType { get; set; }
 
         public virtual Country Country { get; set; }
+        [NotMapped]
+        public string Notes { get; set; }
     }
 }

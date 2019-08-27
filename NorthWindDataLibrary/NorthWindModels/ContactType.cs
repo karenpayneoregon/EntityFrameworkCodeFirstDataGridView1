@@ -1,11 +1,9 @@
-namespace NorthWindDataLibrary
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+namespace NorthWindDataLibrary.NorthWindModels
+{
     [Table("ContactType")]
     public partial class ContactType
     {

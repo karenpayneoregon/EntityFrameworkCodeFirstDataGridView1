@@ -31,6 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.SaveAllChangesButtonAsync = new System.Windows.Forms.Button();
+            this.FilterByContactTypeButton = new System.Windows.Forms.Button();
+            this.ContactTypeComboBox = new System.Windows.Forms.ComboBox();
             this.SaveAllChangesButton = new System.Windows.Forms.Button();
             this.gridView = new System.Windows.Forms.DataGridView();
             this.CompanyNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -55,8 +58,7 @@
             this.bindingNavigatorAddNewCustomer = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorDeleteCustomer = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonFindCustomer = new System.Windows.Forms.ToolStripButton();
-            this.ContactTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.FilterByContactTypeButton = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
@@ -65,6 +67,8 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.SaveAllChangesButtonAsync);
             this.panel1.Controls.Add(this.FilterByContactTypeButton);
             this.panel1.Controls.Add(this.ContactTypeComboBox);
             this.panel1.Controls.Add(this.SaveAllChangesButton);
@@ -73,6 +77,35 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1074, 60);
             this.panel1.TabIndex = 0;
+            // 
+            // SaveAllChangesButtonAsync
+            // 
+            this.SaveAllChangesButtonAsync.Location = new System.Drawing.Point(181, 15);
+            this.SaveAllChangesButtonAsync.Name = "SaveAllChangesButtonAsync";
+            this.SaveAllChangesButtonAsync.Size = new System.Drawing.Size(154, 23);
+            this.SaveAllChangesButtonAsync.TabIndex = 5;
+            this.SaveAllChangesButtonAsync.Text = "Save all changes";
+            this.SaveAllChangesButtonAsync.UseVisualStyleBackColor = true;
+            this.SaveAllChangesButtonAsync.Click += new System.EventHandler(this.SaveAllChangesButtonAsync_Click);
+            // 
+            // FilterByContactTypeButton
+            // 
+            this.FilterByContactTypeButton.Location = new System.Drawing.Point(908, 15);
+            this.FilterByContactTypeButton.Name = "FilterByContactTypeButton";
+            this.FilterByContactTypeButton.Size = new System.Drawing.Size(154, 23);
+            this.FilterByContactTypeButton.TabIndex = 4;
+            this.FilterByContactTypeButton.Text = "Filter by contact type";
+            this.FilterByContactTypeButton.UseVisualStyleBackColor = true;
+            this.FilterByContactTypeButton.Click += new System.EventHandler(this.FilterByContactTypeButton_Click);
+            // 
+            // ContactTypeComboBox
+            // 
+            this.ContactTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ContactTypeComboBox.FormattingEnabled = true;
+            this.ContactTypeComboBox.Location = new System.Drawing.Point(729, 15);
+            this.ContactTypeComboBox.Name = "ContactTypeComboBox";
+            this.ContactTypeComboBox.Size = new System.Drawing.Size(173, 21);
+            this.ContactTypeComboBox.TabIndex = 3;
             // 
             // SaveAllChangesButton
             // 
@@ -292,24 +325,15 @@
             this.toolStripButtonFindCustomer.Text = "toolStripButton1";
             this.toolStripButtonFindCustomer.Click += new System.EventHandler(this.toolStripButtonFindCustomer_Click);
             // 
-            // ContactTypeComboBox
+            // button1
             // 
-            this.ContactTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ContactTypeComboBox.FormattingEnabled = true;
-            this.ContactTypeComboBox.Location = new System.Drawing.Point(729, 15);
-            this.ContactTypeComboBox.Name = "ContactTypeComboBox";
-            this.ContactTypeComboBox.Size = new System.Drawing.Size(173, 21);
-            this.ContactTypeComboBox.TabIndex = 3;
-            // 
-            // FilterByContactTypeButton
-            // 
-            this.FilterByContactTypeButton.Location = new System.Drawing.Point(908, 15);
-            this.FilterByContactTypeButton.Name = "FilterByContactTypeButton";
-            this.FilterByContactTypeButton.Size = new System.Drawing.Size(154, 23);
-            this.FilterByContactTypeButton.TabIndex = 4;
-            this.FilterByContactTypeButton.Text = "Filter by contact type";
-            this.FilterByContactTypeButton.UseVisualStyleBackColor = true;
-            this.FilterByContactTypeButton.Click += new System.EventHandler(this.FilterByContactTypeButton_Click);
+            this.button1.Location = new System.Drawing.Point(359, 15);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // MainForm
             // 
@@ -361,6 +385,8 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonFindCustomer;
         private System.Windows.Forms.ComboBox ContactTypeComboBox;
         private System.Windows.Forms.Button FilterByContactTypeButton;
+        private System.Windows.Forms.Button SaveAllChangesButtonAsync;
+        private System.Windows.Forms.Button button1;
     }
 }
 

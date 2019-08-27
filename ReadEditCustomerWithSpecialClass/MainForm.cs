@@ -4,14 +4,17 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Equin.ApplicationFramework;
 using NorthWindDataLibrary;
 using NorthWindDataLibrary.Classes;
+using NorthWindDataLibrary.NorthWindModels;
 using ReadEditCustomerWithSpecialClass.LanguageExtensions;
 using static ReadEditCustomerWithSpecialClass.Classes.Dialogs;
 
@@ -34,6 +37,8 @@ namespace ReadEditCustomerWithSpecialClass
         {
             InitializeComponent();
 
+            //context.Database.Log = Console.Write;
+            context.Database.Log = FileLogger.Log;
             Shown += Form1_Shown;
             Closing += MainForm_Closing;
             gridView.DataError += CustomersDataGridView_DataError;
@@ -65,15 +70,15 @@ namespace ReadEditCustomerWithSpecialClass
 
             if (f.ShowDialog() == DialogResult.OK)
             {
-                var newId = f.ContactIdentifier;
-                var contact = _operations.GetContacts().FirstOrDefault(cont => cont.ContactId == newId);
+                var newIdentifier = f.ContactIdentifier;
+                var contact = _operations.GetContacts().FirstOrDefault(cont => cont.ContactId == newIdentifier);
                 var customer = context.Customers
                     .FirstOrDefault(cust => cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
 
                 customerEntity.FirstName = contact.FirstName;
                 customerEntity.LastName = contact.LastName;
-                customerEntity.ContactIdentifier = newId;
-                customer.ContactId = newId;
+                customerEntity.ContactIdentifier = newIdentifier;
+                customer.ContactId = newIdentifier;
                 customer.ContactName = $"{contact.FirstName} {contact.LastName}";
                 _customersBindingSource.ResetCurrentItem();
             }
@@ -151,14 +156,20 @@ namespace ReadEditCustomerWithSpecialClass
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Form1_Shown(object sender, EventArgs e)
+        private async void Form1_Shown(object sender, EventArgs e)
         {
+            gridView.SuspendLayout();
             gridView.EditingControlShowing += DataGridView1_EditingControlShowing;
 
             gridView.AutoGenerateColumns = false;
 
-            _customersView = new BindingListView<CustomerEntity>(_operations.AllCustomers(context));
+            var result = await _operations.AllCustomersAsync(context)
+                .ConfigureAwait(false);
 
+            _customersView = 
+                new BindingListView<CustomerEntity>(result);
+
+            Console.WriteLine();
             /*
              * Setup DataGridViewComboBox columns 
              */
@@ -166,11 +177,13 @@ namespace ReadEditCustomerWithSpecialClass
             CountyNameColumn.ValueMember = "CountryIdentifier";
             CountyNameColumn.DataPropertyName = "CountryIdentifier";
             CountyNameColumn.DataSource = _operations.GetCountries();
+            CountyNameColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
 
             ContactTitleColumn.DisplayMember = "ContactTitle";
             ContactTitleColumn.ValueMember = "ContactTypeIdentifier";
             ContactTitleColumn.DataPropertyName = "ContactTypeIdentifier";
             ContactTitleColumn.DataSource = _operations.GetContactTypes();
+            ContactTitleColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
 
             /*
              * Assign list of customers to the BindingSource which then
@@ -178,16 +191,24 @@ namespace ReadEditCustomerWithSpecialClass
              * with sorting capability via the BindingListView
              */
             _customersBindingSource.DataSource = _customersView;
-            gridView.DataSource = _customersBindingSource;
 
-            gridView.ExpandColumns();
+            gridView.Invoke(new Action(() => 
+                gridView.DataSource = _customersBindingSource));
 
-            bindingNavigator1.BindingSource = _customersBindingSource;
+            gridView.Invoke(new Action(() => 
+                gridView.ExpandColumns()));
+
+            bindingNavigator1.Invoke(new Action(() => 
+                bindingNavigator1.BindingSource = 
+                    _customersBindingSource));
 
             var contactTypes = _operations.GetContactTypes();
             contactTypes.Insert(0, new ContactType() { ContactTypeIdentifier = 0, ContactTitle = "All"});
             ContactTypeComboBox.DataSource = contactTypes;
             ContactTypeComboBox.DisplayMember = "ContactTitle";
+
+            gridView.Invoke(new Action(() =>
+                gridView.ResumeLayout()));
 
         }
         /// <summary>
@@ -195,7 +216,8 @@ namespace ReadEditCustomerWithSpecialClass
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        private void DataGridView1_EditingControlShowing(
+            object sender, DataGridViewEditingControlShowingEventArgs e)
         {
             if (!gridView.CurrentCell.IsComboBoxCell()) return;
 
@@ -257,14 +279,33 @@ namespace ReadEditCustomerWithSpecialClass
         /// <param name="e"></param>
         private void SaveAllChangesButton_Click(object sender, EventArgs e)
         {
+            Console.WriteLine(context.SaveChanges());
             try
             {
-                Console.WriteLine(context.SaveChanges());
+                //context.Customers.Add(new Customer());
+                
+            }
+            catch (DbEntityValidationException dbEx)
+            {
+                foreach (var entityErr in dbEx.EntityValidationErrors)
+                {
+                    Console.WriteLine($@"Entity of type ""{entityErr.Entry.Entity.GetType().Name}"" in state ""{entityErr.Entry.State}"" has the following validation errors:");
+                    foreach (var error in entityErr.ValidationErrors)
+                    {
+                        Console.WriteLine($@"- Property: ""{error.PropertyName}"", Value: ""{entityErr.Entry.CurrentValues.GetValue<object>(error.PropertyName)}"", Error: ""{error.ErrorMessage}""");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+        //
+
+        private async void SaveAllChangesButtonAsync_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(await context.SaveChangesAsync());
         }
 
         /// <summary>
@@ -283,7 +324,8 @@ namespace ReadEditCustomerWithSpecialClass
 
             var customerEntity = _customersBindingSource.CurrentCustomerEntity();
             var customer = context.Customers
-                .FirstOrDefault(cust => cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
+                .FirstOrDefault(cust => 
+                    cust.CustomerIdentifier == customerEntity.CustomerIdentifier);
 
             /*
              * Handle DataGridViewComboBox columns
@@ -295,19 +337,23 @@ namespace ReadEditCustomerWithSpecialClass
             {
                 if (currentColumnName == "ContactTitleColumn")
                 {
+                    // ReSharper disable once PossibleNullReferenceException
                     var contactTitleIdentifier = context.ContactTypes
                         .FirstOrDefault(contactType => contactType.ContactTitle == gridView.EditingControl.Text)
                         .ContactTypeIdentifier;
 
-                    context.Entry(customer).Property(x => x.ContactTypeIdentifier).CurrentValue = contactTitleIdentifier;
+                    context.Entry(customer).Property(x => x.ContactTypeIdentifier)
+                        .CurrentValue = contactTitleIdentifier;
 
                 }
                 else if (currentColumnName == "CountyNameColumn")
                 {
                     var countryIdentifier = context.Countries
-                        .FirstOrDefault(country => country.Name == gridView.EditingControl.Text).CountryIdentifier;
+                        .FirstOrDefault(country => country.Name == gridView.EditingControl.Text)
+                        .CountryIdentifier;
 
-                    context.Entry(customer).Property(x => x.CountryIdentifier).CurrentValue = countryIdentifier;
+                    context.Entry(customer).Property(x => x.CountryIdentifier)
+                        .CurrentValue = countryIdentifier;
                 }
                 else
                 {
@@ -337,7 +383,8 @@ namespace ReadEditCustomerWithSpecialClass
             if (Question($"Delete '{currentCustomer.CompanyName}'"))
             {
                 var customer = context.Customers
-                    .FirstOrDefault(cust => cust.CustomerIdentifier == currentCustomer.CustomerIdentifier);
+                    .FirstOrDefault(cust => 
+                        cust.CustomerIdentifier == currentCustomer.CustomerIdentifier);
 
                 context.Entry(customer).State = EntityState.Deleted;
                 _customersBindingSource.RemoveCurrent();
@@ -385,5 +432,9 @@ namespace ReadEditCustomerWithSpecialClass
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _operations.Casing();
+        }
     }
 }

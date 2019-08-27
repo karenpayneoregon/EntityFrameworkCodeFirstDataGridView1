@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
 using System.Linq;
+using System.Threading.Tasks;
+using NorthWindDataLibrary.NorthWindModels;
 
 namespace NorthWindDataLibrary.Classes
 {
@@ -9,6 +14,24 @@ namespace NorthWindDataLibrary.Classes
         /// Context setup in AllCustomers method
         /// </summary>
         private NorthWindAzureContext _context;
+
+        public void Casing()
+        {
+            using (var context = new NorthWindAzureContext())
+            {
+                context.Configuration.LazyLoadingEnabled = false;
+                var example = context.Customers
+                    .Include(cust => cust.Country)
+                    .Include(cust => cust.Contact)
+                    .ToList();
+
+                foreach (var customer in example)
+                {
+                    customer.Country.Customers = null;
+                }
+            }
+
+        }
 
         /// <summary>
         /// Get all customers into a custom class suitable for viewing
@@ -40,6 +63,35 @@ namespace NorthWindDataLibrary.Classes
                     CountryIdentifier = customer.CountryIdentifier,
                     CountyName = customer.Country.Name
                 }).ToList();
+
+            return customerData;
+
+        }
+        public async Task<List<CustomerEntity>> AllCustomersAsync(NorthWindAzureContext context) 
+        {
+            _context = context;
+
+            var customerData  = await (
+                from customer in context.Customers
+                join contactType in context.ContactTypes on customer.ContactTypeIdentifier
+                    equals contactType.ContactTypeIdentifier
+                join contact in context.Contacts on customer.ContactId equals contact.ContactId
+
+                select new CustomerEntity
+                {
+                    CustomerIdentifier = customer.CustomerIdentifier,
+                    CompanyName = customer.CompanyName,
+                    ContactIdentifier = customer.ContactId,
+                    FirstName = contact.FirstName,
+                    LastName = contact.LastName,
+                    ContactTypeIdentifier = contactType.ContactTypeIdentifier,
+                    ContactTitle = contactType.ContactTitle,
+                    Address = customer.Address,
+                    City = customer.City,
+                    PostalCode = customer.PostalCode,
+                    CountryIdentifier = customer.CountryIdentifier,
+                    CountyName = customer.Country.Name
+                }).Take(10).ToListAsync();
 
             return customerData;
 
